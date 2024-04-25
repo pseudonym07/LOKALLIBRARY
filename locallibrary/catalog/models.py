@@ -14,6 +14,7 @@ class Genre(models.Model):
         """Returns the url to access a particular genre instance."""
         return reverse('genre-detail', args=[str(self.id)])
     
+
     from django.urls import reverse # Used to generate URLs by reversing the URL patterns
 
 class Book(models.Model):
@@ -22,6 +23,8 @@ class Book(models.Model):
     author = models.ForeignKey('Author', on_delete=models.RESTRICT, null=True)
     # Foreign Key used because book can only have one author, but authors can have multiple books.
     # Author as a string rather than object because it hasn't been declared yet in file.
+    language = models.ForeignKey('Language', on_delete=models.RESTRICT, null=True, verbose_name= "lang")
+
 
     summary = models.TextField(
         max_length=1000, help_text="Enter a brief description of the book")
@@ -42,6 +45,16 @@ class Book(models.Model):
     def get_absolute_url(self):
         """Returns the URL to access a detail record for this book."""
         return reverse('book-detail', args=[str(self.id)])
+    
+    def display_genre(self):
+        #Makes a returnable string for the admin genre. This is requited to display genre in admin(?)
+        return ', '.join(genre.name for genre in self.genre.all()[:3])
+        display_genre.short_description = 'Genre'
+
+    
+
+
+        
 
 
 class BookInstance(models.Model):
@@ -92,3 +105,11 @@ class Author(models.Model):
     def __str__(self):
         """String for representing the Model object."""
         return f'{self.last_name}, {self.first_name}'
+
+
+
+class Language(models.Model):
+    language = models.CharField(default= "English", max_length=200)
+
+    def __str__(self) -> str:
+        return self.language
